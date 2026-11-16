@@ -1,0 +1,6 @@
+{
+  "pack": {
+    "pack_format": 15,
+    "description": "Item Cleaner — 每 {{INTERVAL_MIN}} 分钟自动清理地面掉落物，清理前 {{WARN_SEC}} 秒预警。由 dsh-plugin-mc-server-ops 生成。"
+  }
+}

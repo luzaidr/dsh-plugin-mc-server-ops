@@ -1,0 +1,65 @@
+{
+  "name": "dsh-plugin-mc-server-ops",
+  "version": "0.1.0",
+  "description": "Minecraft 服务器部署与运维工具箱：RCON 管理、卡顿诊断、公告重启、数据包安装、桌面监控小组件、Windows VPS 部署脚本。适用于 DSH (DeepSeek Harness)。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "minecraft",
+    "rcon",
+    "server-ops",
+    "forge",
+    "fabric",
+    "monitoring",
+    "devops"
+  ],
+  "homepage": "https://github.com/luzaidr/dsh-plugin-mc-server-ops",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luzaidr/dsh-plugin-mc-server-ops.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luzaidr/dsh-plugin-mc-server-ops/issues"
+  },
+  "author": "luzai <1514215802@qq.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/**/*.js",
+    "assets/**/*",
+    "docs/**/*.md",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/schemastery": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": { "optional": true },
+    "@deepseek-ai/dsh-tools": { "optional": true },
+    "@deepseek-ai/schemastery": { "optional": true }
+  },
+  "dsh": {
+    "category": "工作流",
+    "hostOnly": true,
+    "icon": "🎮",
+    "displayName": "Minecraft 服务器运维",
+    "displayNameEn": "Minecraft Server Ops"
+  },
+  "scripts": {
+    "check": "node --check lib/index.js && node --check lib/rcon.js && node --check lib/ssh.js && node --check lib/monitor.js && node --check lib/datapacks.js && node --check lib/diagnose.js",
+    "test": "node test/smoke.mjs"
+  }
+}

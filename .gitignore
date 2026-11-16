@@ -1,0 +1,11 @@
+node_modules/
+.pnpm-store/
+*.log
+.DS_Store
+Thumbs.db
+*.zip
+*.tgz
+dist/
+test/smoke1.mjs
+test/tools.mjs
+test/live.mjs

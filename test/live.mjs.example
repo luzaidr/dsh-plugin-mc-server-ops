@@ -1,0 +1,43 @@
+/**
+ * 真实连接测试模板
+ *
+ * 用法：
+ *   1. 复制成 test/live.mjs
+ *   2. 把下面的示例值换成你自己的服务器
+ *   3. 运行：
+ *        ELECTRON_RUN_AS_NODE=1 "<DSH安装目录>/DSH NEXT.exe" test/live.mjs
+ *        或者：node test/live.mjs
+ *
+ * ⚠️ test/live.mjs 已在 .gitignore 里，不会被提交/打包。
+ */
+import { apply } from "../lib/index.js";
+
+const SERVERS = {
+  main: {
+    label: "我的服务器",
+    host: "play.example.com",       // ← 换成你的服务器地址
+    rconPort: 25575,                // ← RCON 端口（不是 25565）
+    rconPass: "REPLACE_ME",         // ← 换成你的 RCON 密码
+    javaMemMaxGB: 12,
+  },
+};
+
+const tools = new Map();
+const ctx = { tools: { register: (t) => tools.set(t.name, t) } };
+apply(ctx, { servers: SERVERS, defaultServer: "main", timeoutMs: 15000, monitorDir: "" });
+
+async function call(name, args) {
+  const t = tools.get(name);
+  const r = await t.execute(args, { signal: AbortSignal.timeout(60000) });
+  const rendered = t.output?.render ? t.output.render(args, r).map((x) => x.text).join("\n") : JSON.stringify(r);
+  return { r, rendered };
+}
+
+console.log("======== mc_status ========");
+console.log((await call("mc_status", {})).rendered);
+
+console.log("\n======== mc_diagnose ========");
+const d = await call("mc_diagnose", { includeSystem: false });
+console.log(d.rendered);
+
+console.log("\nLIVE_OK");
