@@ -1,7 +1,7 @@
 {
   "name": "dsh-plugin-mc-server-ops",
-  "version": "0.1.0",
-  "description": "Minecraft 服务器部署与运维工具箱：RCON 管理、卡顿诊断、公告重启、数据包安装、桌面监控小组件、Windows VPS 部署脚本。适用于 DSH (DeepSeek Harness)。",
+  "version": "0.2.0",
+  "description": "Minecraft 服务器部署与运维工具箱（22 个工具）：RCON 管理、卡顿诊断、公告重启、数据包安装、桌面监控浮窗、Windows VPS 部署脚本；以及 Cobblemon（宝可梦）专用的发宝可梦/改宝可梦/超进化石/FTB任务修复、fabricplots 地皮、impactor 经济、玩家数据审计、adventure 模式泄漏修复。适用于 DSH (DeepSeek Harness)。",
   "keywords": [
     "dsh",
     "dsh-plugin",
@@ -12,7 +12,9 @@
     "forge",
     "fabric",
     "monitoring",
-    "devops"
+    "devops",
+    "cobblemon",
+    "fabricplots"
   ],
   "homepage": "https://github.com/luzaidr/dsh-plugin-mc-server-ops",
   "repository": {
@@ -59,7 +61,7 @@
     "displayNameEn": "Minecraft Server Ops"
   },
   "scripts": {
-    "check": "node --check lib/index.js && node --check lib/rcon.js && node --check lib/ssh.js && node --check lib/monitor.js && node --check lib/datapacks.js && node --check lib/diagnose.js",
+    "check": "node --check lib/index.js && node --check lib/rcon.js && node --check lib/ssh.js && node --check lib/monitor.js && node --check lib/datapacks.js && node --check lib/diagnose.js && node --check lib/kb.js && node --check lib/cobblemon.js && node --check lib/extras.js && node --check lib/tools-extra.js",
     "test": "node test/smoke.mjs"
   }
 }

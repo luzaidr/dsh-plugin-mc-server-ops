@@ -2,7 +2,7 @@
 
 **Minecraft 服务器部署与运维工具箱** —— 给 [DSH (DeepSeek Harness)](https://github.com/deepseek-ai/deepseek-harness) 用的宿主插件。
 
-把一台 Minecraft 服务器从「装好」到「长期稳定运行」的一整套动作，变成 AI 可以直接调用的 12 个工具。
+把一台 Minecraft 服务器从「装好」到「长期稳定运行」的一整套动作，变成 AI 可以直接调用的 22 个工具。
 
 > 这个插件是从真实运维现场长出来的：一台 Windows VPS 上跑 Forge 1.20.1 的 234 模组丧尸整合包（某丧尸末日整合包），
 > 期间踩过 BOM 编码、`@e` 全局选择器、RCON 多包截断、SSH 杀进程、`falling_block` 隐形卡顿…… 全部沉淀成了工具和知识库。
@@ -24,7 +24,7 @@
 | 数据包管理 | `mc_install_datapack` | 内置 item-cleaner（定时清理掉落物），自动适配 pack_format / functions 目录 |
 | 桌面监控 | `mc_monitor` | 生成始终置顶的浮窗（人数/TPS/MSPT/延迟/曲线/玩家），支持保活计划任务 |
 | 部署脚本包 | `mc_deploy` | 生成 RCON 初始化 + OpenSSH 安装 + 防火墙 + 自动堆内存 + 启动脚本 + 坑位手册 |
-| 知识库 | `mc_pitfalls` | 12 条实战坑与解法，支持关键词检索 |
+| 知识库 | `mc_pitfalls` | 44 条实战坑与解法，支持关键词检索 |
 
 ---
 
@@ -209,3 +209,48 @@ mc_install_datapack pack=item-cleaner intervalMinutes=10 deploy=true reload=true
 ## License
 
 MIT
+
+---
+
+## v0.2.0 — Cobblemon (Pokémon) & plots support
+
+Added 10 tools for **Cobblemon** modpack servers and **fabricplots** land claims. Tool count 12 → **22**, knowledge base 12 → **44** entries.
+
+### New tools
+
+| Tool | What it does |
+|---|---|
+| `mc_pokemon_give` | Give a Pokémon. Auto-adds `execute as <player>`, auto-translates Chinese nature/ability/item/move names into the English parameter values Cobblemon expects. |
+| `mc_pokemon_edit` | Edit a Pokémon. **Hard guard**: `moves=` requires exactly 4 moves — it *replaces* the whole moveset, so passing 1–3 silently wipes the rest. The tool refuses instead. |
+| `mc_pokemon_team` | Read a player's party via `world/usercache.json` → `cobblemonplayerdata/<uuid>.json`. **Read-only, never modifies anything.** |
+| `mc_pokemon_item` | Give items / mega stones / mega bracelet. Resolves Chinese names to the **real** IDs (`mega_showdown:*`, not `zamega:*`). |
+| `mc_plots` | fabricplots: read config, **detect dangerous mob-purge settings**, one-click safe config, broadcast the "plots are not persisted" restart warning. |
+| `mc_economy` | Economy ops with the **correct argument order** (`amount currency player`), and tells you RCON cannot read the balance back. |
+| `mc_playerdata` | Audit player data: zero-byte / truncated `.dat`, orphaned `.dat.old` (recoverable), Cobblemon data, rctmod progress. |
+| `mc_gamemode_fix` | Fix "stuck in adventure mode": query, force survival, or deploy the `adventure-fix` datapack. |
+| `mc_quest` | Fix stuck FTB Quests: generate stub advancements for references that **do not exist**, then grant. |
+| `mc_jvm` | JVM args by physical-memory tiers (16 GB → `-Xmx12G`, 64 GB → `-Xmx22G`, both field-tested), written **UTF-8 without BOM**. |
+
+### Translation tables (the part that makes it actually usable)
+
+`lib/cobblemon.js` ships Chinese → English dictionaries:
+
+- Natures: **50** entries (内敛→modest, 胆小→timid, 爽朗→jolly, 固执→adamant …)
+- Abilities: **40** entries (降雨→drizzle, 扬沙→sandstream, 画皮→disguise …)
+- Items: **39** entries (生命宝珠→`cobblemon:life_orb`, 凹凸头盔→`cobblemon:rocky_helmet`, 喷火龙Y进化石→`mega_showdown:charizardite_y` …)
+- Moves: **78** entries (浊流→muddywater, 流星群→dracometeor, 急速折返→uturn …)
+
+### New datapack templates
+
+- `adventure-fix` — every 5 s, switches players who are in `adventure` **outside** the arena dimension back to `survival`. Fixes the spleef-arena gamemode leak.
+- `quest-adv-fix` — generates `minecraft:impossible` stub advancements for FTB Quest tasks that reference nonexistent advancements (one 51-chapter pack had **208** such broken references).
+
+### Field-tested numbers baked in
+
+| Item | Value |
+|---|---|
+| 16 GB server | `-Xms6G -Xmx12G` (working set ~5 GB) |
+| 64 GB server | `-Xms16G -Xmx22G` (was 32G + AlwaysPreTouch → Windows error 1450) |
+| fabricplots safe | `mob-scan-interval-ticks=2147483000`, `unnamed-mob-grace-ticks=2147483000`, `mob-cap-per-plot=999` |
+| Economy | `economy deposit 10000 impactor:dollars <player>` |
+| Mega stones | `mega_showdown:charizardite_y` / `metagrossite` / `golisopite` / `sablenite` |

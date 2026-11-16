@@ -1,7 +1,7 @@
 # Minecraft 服务器运维插件（中文说明）
 
 > [DSH (DeepSeek Harness)](https://github.com/deepseek-ai/deepseek-harness) 宿主插件
-> 把「一台 Minecraft 服务器从装好到长期稳定运行」的全套动作，变成 AI 可直接调用的 12 个工具。
+> 把「一台 Minecraft 服务器从装好到长期稳定运行」的全套动作，变成 AI 可直接调用的 22 个工具。
 
 英文说明见 [README.md](README.md)。
 
@@ -24,7 +24,7 @@
 
 ---
 
-## 12 个工具
+## 12 个基础工具
 
 | 工具 | 作用 | 需要 |
 |---|---|---|
@@ -39,7 +39,7 @@
 | `mc_install_datapack` | 生成/部署数据包 | 本地（+SSH 部署） |
 | `mc_monitor` | 桌面监控浮窗 + 保活 | Windows |
 | `mc_deploy` | 生成 Windows VPS 部署包 | 本地 |
-| `mc_pitfalls` | 运维知识库（12 条坑） | 无 |
+| `mc_pitfalls` | 运维知识库（44 条坑） | 无 |
 
 ---
 
@@ -132,3 +132,48 @@ mc_install_datapack pack=item-cleaner intervalMinutes=10 deploy=true reload=true
 ## License
 
 MIT
+
+---
+
+## v0.2.0 — 补上宝可梦服（Cobblemon）与地皮
+
+工具 **12 → 22 个**，知识库 **12 → 44 条**。
+
+### 新增的 10 个工具
+
+| 工具 | 作用 |
+|---|---|
+| `mc_pokemon_give` | 发宝可梦。自动加 `execute as <玩家>`，自动把中文的性格/特性/道具/技能翻译成 Cobblemon 认的英文参数 |
+| `mc_pokemon_edit` | 改宝可梦。**硬护栏**：`moves=` 必须正好 4 个——它是**替换整个技能栏**，只传 1~3 个会把剩下的静默清空。工具会直接拒绝 |
+| `mc_pokemon_team` | 读队伍。走 `world/usercache.json` → `cobblemonplayerdata/<uuid>.json`，**只读不写** |
+| `mc_pokemon_item` | 发道具/超进化石/超级手环。中文名解析成**真实 ID**（`mega_showdown:*`，不是 `zamega:*`）|
+| `mc_plots` | fabricplots：读配置、**检测危险的生物清理设置**、一键安全配置、广播「地皮不持久化」预警 |
+| `mc_economy` | 经济操作，强制正确的参数顺序（**金额 货币 玩家**），并提示 RCON 读不到余额回显 |
+| `mc_playerdata` | 玩家数据审计：零字节/截断的 `.dat`、孤立 `.dat.old`（可恢复）、宝可梦数据、rctmod 进度 |
+| `mc_gamemode_fix` | 修「卡在冒险模式」：查询、强切 survival、部署 `adventure-fix` 数据包 |
+| `mc_quest` | 修 FTB Quests 卡任务：给**根本不存在的成就**生成桩成就，再补发 |
+| `mc_jvm` | 按物理内存档位给 JVM 参数（16 GB → `-Xmx12G`，64 GB → `-Xmx22G`，都是实测值），**UTF-8 无 BOM** 写入 |
+
+### 中文 → 英文 翻译表（真正让它可用的部分）
+
+`lib/cobblemon.js` 内置：
+
+- **性格 50 条**：内敛→modest、胆小→timid、爽朗→jolly、固执→adamant …
+- **特性 40 条**：降雨→drizzle、扬沙→sandstream、画皮→disguise …
+- **道具 39 条**：生命宝珠→`cobblemon:life_orb`、凹凸头盔→`cobblemon:rocky_helmet`、喷火龙Y进化石→`mega_showdown:charizardite_y` …
+- **技能 78 条**：浊流→muddywater、流星群→dracometeor、急速折返→uturn …
+
+### 新增数据包模板
+
+- `adventure-fix` — 每 5 秒把**竞技场维度之外**处于 `adventure` 的玩家切回 `survival`。治 spleef 竞技场的游戏模式泄漏
+- `quest-adv-fix` — 为 FTB Quests 引用的**不存在的成就**生成 `minecraft:impossible` 桩成就（一个 51 章的整合包里能扫出 **208 处**这种坏引用）
+
+### 沉淀进去的实测数字
+
+| 项目 | 值 |
+|---|---|
+| 16 GB 服务器 | `-Xms6G -Xmx12G`（工作集约 5 GB）|
+| 64 GB 服务器 | `-Xms16G -Xmx22G`（曾用 32G + AlwaysPreTouch → Windows 报 1450）|
+| fabricplots 安全值 | `mob-scan-interval-ticks=2147483000`、`unnamed-mob-grace-ticks=2147483000`、`mob-cap-per-plot=999` |
+| 经济命令 | `economy deposit 10000 impactor:dollars <玩家>` |
+| 超进化石 | `mega_showdown:charizardite_y` / `metagrossite` / `golisopite` / `sablenite` |
